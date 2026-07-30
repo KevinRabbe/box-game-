@@ -2,50 +2,38 @@ extends Node
 
 @export var enemy_scene: PackedScene
 @export var target_path: NodePath
-@export var spawn_interval: float = 0.9
 @export var spawn_margin: float = 40.0
 
 var _target: Node2D
-var _timer: Timer
 
 
 func _ready() -> void:
 	_target = get_node_or_null(target_path) as Node2D
 	if _target == null:
 		push_error("EnemySpawner could not resolve target_path.")
-		set_process(false)
-		return
 
 	if enemy_scene == null:
 		push_error("EnemySpawner has no enemy_scene assigned.")
-		set_process(false)
-		return
-
-	_timer = Timer.new()
-	_timer.wait_time = maxf(0.05, spawn_interval)
-	_timer.one_shot = false
-	_timer.autostart = true
-	_timer.timeout.connect(_spawn_enemy)
-	add_child(_timer)
-
-	_spawn_enemy()
 
 
-func _spawn_enemy() -> void:
+func spawn_enemy() -> Node2D:
 	if not is_instance_valid(_target) or enemy_scene == null:
-		return
+		return null
 
 	var enemy := enemy_scene.instantiate()
 	if not enemy is Node2D:
 		push_error("EnemySpawner enemy_scene root must inherit Node2D.")
 		enemy.queue_free()
-		return
+		return null
 
 	get_parent().add_child(enemy)
-	(enemy as Node2D).global_position = _random_spawn_position()
+	var enemy_node := enemy as Node2D
+	enemy_node.global_position = _random_spawn_position()
 
 	if enemy.has_method("set_target"):
 		enemy.set_target(_target)
+
+	return enemy_node
 
 
 func _random_spawn_position() -> Vector2:
