@@ -1,0 +1,36 @@
+extends CharacterBody2D
+
+@onready var health_component: HealthComponent = $HealthComponent
+@onready var movement_component: MovementComponent = $MovementComponent
+
+var _target: Node2D
+
+
+func _ready() -> void:
+	health_component.died.connect(_on_died)
+
+
+func set_target(target: Node2D) -> void:
+	_target = target
+
+
+func _physics_process(_delta: float) -> void:
+	if not is_instance_valid(_target):
+		velocity = Vector2.ZERO
+		return
+
+	velocity = movement_component.velocity_toward(global_position, _target.global_position)
+	move_and_slide()
+
+
+func get_health_component() -> HealthComponent:
+	return health_component
+
+
+func is_targetable() -> bool:
+	return not health_component.is_dead()
+
+
+func _on_died() -> void:
+	remove_from_group(&"enemies")
+	queue_free()
