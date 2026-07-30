@@ -1,24 +1,37 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_box.gd" id="1_player"]
-[ext_resource type="Script" path="res://scripts/components/targeting_component.gd" id="2_targeting"]
-[ext_resource type="Script" path="res://scripts/components/weapon_component.gd" id="3_weapon"]
-[ext_resource type="PackedScene" path="res://scenes/combat/projectile.tscn" id="4_projectile"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/targeting_component.gd" id="3_targeting"]
+[ext_resource type="Script" path="res://scripts/components/weapon_component.gd" id="4_weapon"]
+[ext_resource type="PackedScene" path="res://scenes/combat/projectile.tscn" id="5_projectile"]
 
-[node name="PlayerBox" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(64, 64)
+
+[node name="PlayerBox" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
 script = ExtResource("1_player")
 
 [node name="Visual" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 color = Color(0.96, 0.96, 0.98, 1)
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 100.0
+
 [node name="TargetingComponent" type="Node" parent="."]
-script = ExtResource("2_targeting")
+script = ExtResource("3_targeting")
 max_range = 420.0
 
 [node name="WeaponComponent" type="Node" parent="."]
-script = ExtResource("3_weapon")
-projectile_scene = ExtResource("4_projectile")
+script = ExtResource("4_weapon")
+projectile_scene = ExtResource("5_projectile")
 projectile_container_path = NodePath("../../ProjectileContainer")
 damage = 10.0
 fire_rate = 2.0
