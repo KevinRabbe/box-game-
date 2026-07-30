@@ -1,0 +1,38 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_box.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/movement_component.gd" id="3_movement"]
+[ext_resource type="Script" path="res://scripts/components/contact_damage_component.gd" id="4_contact"]
+[ext_resource type="Script" path="res://scripts/components/reward_component.gd" id="5_reward"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
+size = Vector2(120, 120)
+
+[node name="BigBox" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-60, -60, 60, -60, 60, 60, -60, 60)
+color = Color(0.86, 0.86, 0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_boss")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 350.0
+
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("3_movement")
+speed = 42.0
+
+[node name="ContactDamageComponent" type="Node" parent="."]
+script = ExtResource("4_contact")
+damage = 60.0
+
+[node name="RewardComponent" type="Node" parent="."]
+script = ExtResource("5_reward")
+coins = 60
