@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_box.tscn" id="2_player"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/waves/wave_manager.gd" id="5_waves"]
 [ext_resource type="Script" path="res://scripts/economy/run_economy.gd" id="6_economy"]
 [ext_resource type="Script" path="res://scripts/upgrades/upgrade_manager.gd" id="7_upgrades"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/big_box.tscn" id="8_boss"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
@@ -19,6 +20,7 @@ position = Vector2(360, 640)
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("4_spawner")
 enemy_scene = ExtResource("3_enemy")
+boss_scene = ExtResource("8_boss")
 target_path = NodePath("../PlayerBox")
 spawn_margin = 40.0
 
@@ -29,6 +31,7 @@ base_enemy_count = 4
 enemies_added_per_wave = 2
 spawn_interval = 0.45
 inter_wave_delay = 1.25
+boss_every_n_waves = 10
 
 [node name="RunEconomy" type="Node" parent="."]
 script = ExtResource("6_economy")
