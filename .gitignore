@@ -2,8 +2,16 @@
 .godot/
 
 # Exported builds
+build/
 builds/
 export/
+exports/
+*.apk
+*.aab
+*.pck
+
+# Local backend deployment config
+backend/wrangler.toml
 
 # OS/editor noise
 .DS_Store
