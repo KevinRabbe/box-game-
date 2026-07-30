@@ -2,28 +2,75 @@
 
 A deliberately minimal 2D defense game built around one rule: **the community decides what gets added next**.
 
-The launch game is intentionally made from simple boxes and basic shapes. The first technical target is a tiny, clean, modular playable build where enemies approach a central box and the central box automatically shoots them.
+The game is intentionally made from boxes and basic shapes. Minimal visuals are part of the identity, not temporary placeholder art.
 
-## Current target
+## Current state
 
-**First Playable (FP-01): A box shoots a box.**
+The repository now contains a feature-complete implementation pass for the **first playable**.
 
-- A player box sits in the center of a portrait arena.
-- Enemy boxes spawn around the arena edge.
-- Enemies move toward the player.
-- The player automatically targets the nearest enemy in range.
-- The player automatically fires projectiles.
-- Projectiles deal damage.
-- Enemies die at zero health.
-- The loop continues indefinitely.
+Current intended loop:
 
-No coins, waves, menus, backend, voting, art assets, or progression are required for FP-01.
+```text
+Main Menu
+   ↓
+PLAY
+   ↓
+Boxes attack the center
+   ↓
+Player auto-shoots
+   ↓
+Kills earn coins
+   ↓
+Buy four run upgrades
+   ↓
+Clear increasingly large waves
+   ↓
+Every 10th wave → BIG BOX
+   ↓
+Die
+   ↓
+Restart / Main Menu
+```
 
-### Current implementation status
+Implemented gameplay:
 
-The first implementation pass for FP-01 is in the repository. It still needs to be opened and run in a Godot 4.x editor/runtime before the milestone is considered verified.
+- Central player box with automatic targeting and shooting.
+- Normal, Fast, and Heavy enemy boxes.
+- Big Box boss every tenth wave.
+- Player health and enemy contact damage.
+- Endless wave progression.
+- Coin rewards for kills.
+- Damage, fire-rate, max-HP, and range upgrades.
+- Game-over and restart flow.
+- Highest-wave local save.
 
-See [Development status](docs/06_DEVELOPMENT_STATUS.md) for the exact verification checklist.
+Implemented application shell:
+
+- Minimal main menu.
+- Community Vote entry.
+- Persistent installation ID.
+- Remote voting client boundary.
+- Voting backend scaffold under `backend/`.
+- Headless Godot validation workflow under `.github/workflows/`.
+
+## Community voting
+
+The Godot vote client is implemented but the production backend URL is intentionally blank until a real backend is deployed.
+
+The backend scaffold provides:
+
+```text
+GET  /polls/active
+POST /votes
+```
+
+See [Community voting](docs/05_COMMUNITY_VOTING.md) and [backend deployment notes](backend/README.md).
+
+## Important development rule
+
+Do not turn the first release into a large game before publishing it.
+
+The point is to ship a small, deliberately basic BOX DEFENSE and let players vote on future additions.
 
 ## Documentation
 
