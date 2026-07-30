@@ -1,5 +1,7 @@
 extends Node
 
+signal enemy_spawned(enemy: Node2D)
+
 @export var enemy_scene: PackedScene
 @export var target_path: NodePath
 @export var spawn_margin: float = 40.0
@@ -33,6 +35,7 @@ func spawn_enemy() -> Node2D:
 	if enemy.has_method("set_target"):
 		enemy.set_target(_target)
 
+	enemy_spawned.emit(enemy_node)
 	return enemy_node
 
 
