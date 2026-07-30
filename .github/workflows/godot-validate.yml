@@ -32,3 +32,10 @@ jobs:
 
       - name: Parse project headlessly
         run: godot --headless --path . --editor --quit
+
+      - name: Run gameplay smoke simulation
+        run: >-
+          godot --headless --path .
+          --scene res://scenes/game/game.tscn
+          --fixed-fps 60
+          --quit-after 900
