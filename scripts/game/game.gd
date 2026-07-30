@@ -22,6 +22,7 @@ extends Node2D
 @onready var game_over_layer: CanvasLayer = $GameOver
 @onready var game_over_summary: Label = $GameOver/Overlay/Summary
 @onready var restart_button: Button = $GameOver/Overlay/RestartButton
+@onready var menu_button: Button = $GameOver/Overlay/MenuButton
 
 var _game_over := false
 var _boxes_destroyed: int = 0
@@ -41,6 +42,7 @@ func _ready() -> void:
 	health_button.pressed.connect(_buy_max_health)
 	range_button.pressed.connect(_buy_range)
 	restart_button.pressed.connect(_restart_game)
+	menu_button.pressed.connect(_return_to_menu)
 
 	game_over_layer.visible = false
 	_on_player_health_changed(player_health.current_health, player_health.max_health)
@@ -75,7 +77,11 @@ func _on_player_health_changed(current_health: float, max_health: float) -> void
 
 
 func _on_wave_started(wave_number: int) -> void:
-	wave_label.text = "WAVE: %d" % wave_number
+	SaveManager.record_wave(wave_number)
+	if wave_manager.is_boss_wave():
+		wave_label.text = "WAVE: %d  BIG BOX" % wave_number
+	else:
+		wave_label.text = "WAVE: %d" % wave_number
 
 
 func _on_coins_changed(coins: int) -> void:
@@ -143,6 +149,7 @@ func _on_player_died() -> void:
 	_game_over = true
 	wave_manager.stop()
 	player_box.set_process(false)
+	SaveManager.record_wave(wave_manager.current_wave)
 
 	for enemy in get_tree().get_nodes_in_group(&"enemies"):
 		enemy.queue_free()
@@ -161,3 +168,7 @@ func _on_player_died() -> void:
 
 func _restart_game() -> void:
 	get_tree().reload_current_scene()
+
+
+func _return_to_menu() -> void:
+	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
