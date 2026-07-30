@@ -3,9 +3,16 @@ extends Node
 signal enemy_spawned(enemy: Node2D)
 
 @export var enemy_scene: PackedScene
+@export var fast_enemy_scene: PackedScene
+@export var heavy_enemy_scene: PackedScene
 @export var boss_scene: PackedScene
 @export var target_path: NodePath
 @export var spawn_margin: float = 40.0
+
+@export var fast_unlock_wave: int = 3
+@export var heavy_unlock_wave: int = 5
+@export_range(0.0, 1.0, 0.01) var fast_chance: float = 0.30
+@export_range(0.0, 1.0, 0.01) var heavy_chance: float = 0.25
 
 var _target: Node2D
 
@@ -19,8 +26,8 @@ func _ready() -> void:
 		push_error("EnemySpawner has no enemy_scene assigned.")
 
 
-func spawn_enemy() -> Node2D:
-	return _spawn_scene(enemy_scene)
+func spawn_enemy(wave_number: int = 1) -> Node2D:
+	return _spawn_scene(_choose_enemy_scene(wave_number))
 
 
 func spawn_boss() -> Node2D:
@@ -28,6 +35,18 @@ func spawn_boss() -> Node2D:
 		push_warning("EnemySpawner has no boss_scene assigned; spawning normal enemy instead.")
 		return spawn_enemy()
 	return _spawn_scene(boss_scene)
+
+
+func _choose_enemy_scene(wave_number: int) -> PackedScene:
+	var roll := randf()
+
+	if wave_number >= heavy_unlock_wave and heavy_enemy_scene != null and roll < heavy_chance:
+		return heavy_enemy_scene
+
+	if wave_number >= fast_unlock_wave and fast_enemy_scene != null and roll < heavy_chance + fast_chance:
+		return fast_enemy_scene
+
+	return enemy_scene
 
 
 func _spawn_scene(scene: PackedScene) -> Node2D:
