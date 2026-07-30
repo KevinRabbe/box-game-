@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_box.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_box.tscn" id="3_enemy"]
 [ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="4_spawner"]
 [ext_resource type="Script" path="res://scripts/waves/wave_manager.gd" id="5_waves"]
+[ext_resource type="Script" path="res://scripts/economy/run_economy.gd" id="6_economy"]
+[ext_resource type="Script" path="res://scripts/upgrades/upgrade_manager.gd" id="7_upgrades"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
@@ -28,39 +30,122 @@ enemies_added_per_wave = 2
 spawn_interval = 0.45
 inter_wave_delay = 1.25
 
-[node name="DebugHUD" type="CanvasLayer" parent="."]
+[node name="RunEconomy" type="Node" parent="."]
+script = ExtResource("6_economy")
 
-[node name="Title" type="Label" parent="DebugHUD"]
+[node name="UpgradeManager" type="Node" parent="."]
+script = ExtResource("7_upgrades")
+player_path = NodePath("../PlayerBox")
+economy_path = NodePath("../RunEconomy")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="HUD"]
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 440.0
 offset_bottom = 70.0
 theme_override_font_sizes/font_size = 22
-text = "BOX DEFENSE\nFIRST PLAYABLE"
+text = "BOX DEFENSE"
 
-[node name="Health" type="Label" parent="DebugHUD"]
+[node name="Health" type="Label" parent="HUD"]
 offset_left = 20.0
-offset_top = 92.0
-offset_right = 220.0
-offset_bottom = 122.0
+offset_top = 70.0
+offset_right = 260.0
+offset_bottom = 100.0
 theme_override_font_sizes/font_size = 18
 text = "HP: 100 / 100"
 
-[node name="Wave" type="Label" parent="DebugHUD"]
+[node name="Wave" type="Label" parent="HUD"]
 offset_left = 20.0
-offset_top = 126.0
+offset_top = 104.0
 offset_right = 220.0
-offset_bottom = 156.0
+offset_bottom = 134.0
 theme_override_font_sizes/font_size = 18
 text = "WAVE: 0"
 
-[node name="EnemyCount" type="Label" parent="DebugHUD"]
+[node name="EnemyCount" type="Label" parent="HUD"]
 offset_left = 20.0
-offset_top = 160.0
-offset_right = 220.0
-offset_bottom = 190.0
+offset_top = 138.0
+offset_right = 240.0
+offset_bottom = 168.0
 theme_override_font_sizes/font_size = 18
 text = "ENEMIES: 0"
+
+[node name="Coins" type="Label" parent="HUD"]
+offset_left = 500.0
+offset_top = 70.0
+offset_right = 700.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 18
+text = "COINS: 0"
+horizontal_alignment = 2
+
+[node name="Kills" type="Label" parent="HUD"]
+offset_left = 420.0
+offset_top = 104.0
+offset_right = 700.0
+offset_bottom = 134.0
+theme_override_font_sizes/font_size = 18
+text = "DESTROYED: 0"
+horizontal_alignment = 2
+
+[node name="Stats" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_top = 910.0
+offset_right = 700.0
+offset_bottom = 950.0
+theme_override_font_sizes/font_size = 16
+text = "DMG 10   RATE 2.0/s   RANGE 420"
+horizontal_alignment = 1
+
+[node name="UpgradePanel" type="ColorRect" parent="HUD"]
+offset_left = 20.0
+offset_top = 960.0
+offset_right = 700.0
+offset_bottom = 1260.0
+color = Color(0.08, 0.08, 0.095, 0.94)
+
+[node name="Header" type="Label" parent="HUD/UpgradePanel"]
+offset_left = 20.0
+offset_top = 12.0
+offset_right = 660.0
+offset_bottom = 44.0
+theme_override_font_sizes/font_size = 18
+text = "RUN UPGRADES"
+horizontal_alignment = 1
+
+[node name="DamageButton" type="Button" parent="HUD/UpgradePanel"]
+offset_left = 20.0
+offset_top = 55.0
+offset_right = 325.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 17
+text = "DAMAGE  LV.0\n20 COINS"
+
+[node name="FireRateButton" type="Button" parent="HUD/UpgradePanel"]
+offset_left = 355.0
+offset_top = 55.0
+offset_right = 660.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 17
+text = "FIRE RATE  LV.0\n25 COINS"
+
+[node name="HealthButton" type="Button" parent="HUD/UpgradePanel"]
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 325.0
+offset_bottom = 270.0
+theme_override_font_sizes/font_size = 17
+text = "MAX HP  LV.0\n25 COINS"
+
+[node name="RangeButton" type="Button" parent="HUD/UpgradePanel"]
+offset_left = 355.0
+offset_top = 170.0
+offset_right = 660.0
+offset_bottom = 270.0
+theme_override_font_sizes/font_size = 17
+text = "RANGE  LV.0\n30 COINS"
 
 [node name="GameOver" type="CanvasLayer" parent="."]
 layer = 10
@@ -69,22 +154,22 @@ visible = false
 [node name="Overlay" type="ColorRect" parent="GameOver"]
 offset_right = 720.0
 offset_bottom = 1280.0
-color = Color(0.02, 0.02, 0.025, 0.92)
+color = Color(0.02, 0.02, 0.025, 0.94)
 
 [node name="Summary" type="Label" parent="GameOver/Overlay"]
-offset_left = 180.0
-offset_top = 470.0
-offset_right = 540.0
-offset_bottom = 590.0
-theme_override_font_sizes/font_size = 32
-text = "GAME OVER\nWAVE 0"
+offset_left = 120.0
+offset_top = 420.0
+offset_right = 600.0
+offset_bottom = 620.0
+theme_override_font_sizes/font_size = 30
+text = "GAME OVER\nWAVE 0\n0 BOXES DESTROYED\n0 COINS"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="RestartButton" type="Button" parent="GameOver/Overlay"]
 offset_left = 220.0
-offset_top = 630.0
+offset_top = 660.0
 offset_right = 500.0
-offset_bottom = 710.0
+offset_bottom = 740.0
 theme_override_font_sizes/font_size = 24
 text = "RESTART"
