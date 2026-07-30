@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_box.gd" id="1_enemy"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
 [ext_resource type="Script" path="res://scripts/components/movement_component.gd" id="3_movement"]
 [ext_resource type="Script" path="res://scripts/components/contact_damage_component.gd" id="4_contact"]
+[ext_resource type="Script" path="res://scripts/components/reward_component.gd" id="5_reward"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
 size = Vector2(44, 44)
@@ -31,3 +32,7 @@ speed = 90.0
 [node name="ContactDamageComponent" type="Node" parent="."]
 script = ExtResource("4_contact")
 damage = 20.0
+
+[node name="RewardComponent" type="Node" parent="."]
+script = ExtResource("5_reward")
+coins = 5
