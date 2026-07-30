@@ -1,0 +1,12 @@
+# Godot 4+
+.godot/
+
+# Exported builds
+builds/
+export/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
