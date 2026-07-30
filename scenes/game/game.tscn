@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_box.tscn" id="2_player"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/economy/run_economy.gd" id="6_economy"]
 [ext_resource type="Script" path="res://scripts/upgrades/upgrade_manager.gd" id="7_upgrades"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/big_box.tscn" id="8_boss"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/fast_box.tscn" id="9_fast"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/heavy_box.tscn" id="10_heavy"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
@@ -20,6 +22,8 @@ position = Vector2(360, 640)
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("4_spawner")
 enemy_scene = ExtResource("3_enemy")
+fast_enemy_scene = ExtResource("9_fast")
+heavy_enemy_scene = ExtResource("10_heavy")
 boss_scene = ExtResource("8_boss")
 target_path = NodePath("../PlayerBox")
 spawn_margin = 40.0
