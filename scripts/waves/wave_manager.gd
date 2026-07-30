@@ -9,6 +9,7 @@ signal wave_completed(wave_number: int)
 @export var enemies_added_per_wave: int = 2
 @export var spawn_interval: float = 0.45
 @export var inter_wave_delay: float = 1.25
+@export var boss_every_n_waves: int = 10
 
 var current_wave: int = 0
 var _spawner: Node
@@ -17,6 +18,7 @@ var _inter_wave_timer: Timer
 var _remaining_to_spawn: int = 0
 var _waiting_for_clear := false
 var _active := true
+var _boss_wave := false
 
 
 func _ready() -> void:
@@ -61,12 +63,22 @@ func stop() -> void:
 		_inter_wave_timer.stop()
 
 
+func is_boss_wave() -> bool:
+	return _boss_wave
+
+
 func _start_next_wave() -> void:
 	if not _active:
 		return
 
 	current_wave += 1
-	_remaining_to_spawn = base_enemy_count + ((current_wave - 1) * enemies_added_per_wave)
+	_boss_wave = boss_every_n_waves > 0 and current_wave % boss_every_n_waves == 0
+
+	if _boss_wave:
+		_remaining_to_spawn = 1
+	else:
+		_remaining_to_spawn = base_enemy_count + ((current_wave - 1) * enemies_added_per_wave)
+
 	wave_started.emit(current_wave)
 	_spawn_next_enemy()
 
@@ -75,7 +87,9 @@ func _spawn_next_enemy() -> void:
 	if not _active or _remaining_to_spawn <= 0:
 		return
 
-	if _spawner.has_method("spawn_enemy"):
+	if _boss_wave and _spawner.has_method("spawn_boss"):
+		_spawner.call("spawn_boss")
+	elif _spawner.has_method("spawn_enemy"):
 		_spawner.call("spawn_enemy")
 
 	_remaining_to_spawn -= 1
