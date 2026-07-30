@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Community voting is the product differentiator, but it is not part of FP-01. This document protects the architectural boundary now so combat does not become coupled to networking later.
+Community voting is the product differentiator. The local game now has a voting screen and networking boundary; the remaining release task is deploying the small backend that satisfies the client contract below.
 
 ## Product rule
 
@@ -50,7 +50,7 @@ WHAT SHOULD WE ADD NEXT?
 Ends in 2d 08h
 ```
 
-The exact decision about whether percentages are visible before voting should be made when implementing voting. Hiding live results until after a vote reduces bandwagon effects; showing them immediately creates more social energy. Both are valid product choices.
+For v1, results should be shown after the player has voted. The API can also set `show_results: true` when results should be visible to everyone.
 
 ## v1 constraints
 
@@ -74,70 +74,72 @@ Vote service/database
 
 Admin tool
     ↓
-Authenticated admin API
+Authenticated admin API / protected database console
 ```
 
-## Suggested API shape
+## Implemented client contract
 
-The exact backend technology can be chosen later. The client contract should remain small.
+The Godot client currently expects a base URL configured on the `VoteService` node.
 
-### Get active poll
+### `GET /polls/active?player_id=<installation-id>`
 
-Conceptual response:
+Return the active poll in this shape:
 
 ```json
 {
   "id": "poll_001",
   "question": "What should we add next?",
-  "option_a": {
-    "id": "weapons",
-    "label": "Weapons"
-  },
-  "option_b": {
-    "id": "new_enemies",
-    "label": "New Enemies"
-  },
-  "starts_at": "...",
-  "ends_at": "...",
-  "status": "open",
-  "results": {
-    "a": 3812,
-    "b": 4921
-  },
-  "my_vote": null
+  "ends_text": "ENDS IN 2D 08H",
+  "show_results": false,
+  "player_vote": "",
+  "options": [
+    {
+      "id": "weapons",
+      "text": "WEAPONS",
+      "votes": 3812
+    },
+    {
+      "id": "new_enemies",
+      "text": "NEW ENEMIES",
+      "votes": 4921
+    }
+  ]
 }
 ```
 
-### Submit vote
+`player_vote` is an empty string when this installation has not voted. After a recorded vote it contains the selected option ID.
 
-Conceptual request:
+The first release can return a preformatted `ends_text`; moving countdown calculation fully into the client is optional later.
+
+### `POST /votes`
+
+Request:
 
 ```json
 {
   "poll_id": "poll_001",
   "option_id": "weapons",
-  "player_id": "installation-or-account-id"
+  "player_id": "persistent-installation-id"
 }
 ```
 
-Conceptual response:
+On success, return the same poll representation used by `GET /polls/active`, now with `player_vote` populated and updated totals.
 
-```json
-{
-  "accepted": true,
-  "my_vote": "weapons"
-}
-```
+This keeps the client simple: both loading and voting end by rendering the same data structure.
 
 ## Identity and duplicate voting
 
 The first release does not require perfect election-grade identity. It requires reasonable protection against accidental/naive duplicate voting.
 
-Possible stages:
-
 ### Stage 1 — installation identity
 
-Generate a random persistent installation ID and accept one vote per installation per poll.
+The game now generates a random persistent installation ID and stores it in the versioned local save.
+
+Server rule:
+
+```text
+UNIQUE(poll_id, player_id)
+```
 
 Advantages:
 
@@ -150,7 +152,7 @@ Weaknesses:
 - Reinstall/reset can create another identity.
 - Determined users can vote multiple times.
 
-This may be acceptable for early community feature polls.
+This is acceptable for early feature polls unless abuse becomes a real problem.
 
 ### Stage 2 — platform/account identity
 
@@ -162,10 +164,11 @@ Do not add login complexity until it solves a real problem.
 
 - No admin token inside the game binary.
 - Validate poll state and option IDs server-side.
-- Enforce one recorded vote per chosen identity strategy server-side.
+- Enforce one recorded vote per poll/player identity server-side.
 - Rate-limit vote submission endpoints.
-- Treat all client-provided vote totals as untrusted; ideally never send totals from client at all.
+- Ignore client-provided vote totals; the client never needs to submit totals.
 - Use HTTPS.
+- Admin endpoints or database writes must require credentials unavailable to the game client.
 
 ## Failure behavior
 
@@ -174,12 +177,46 @@ Voting is optional to moment-to-moment gameplay.
 If networking fails:
 
 - Main gameplay remains playable.
-- Vote screen shows a simple retry/offline message.
+- Vote screen shows a simple error/offline state.
 - Never block startup because the poll cannot load.
 
 If submission outcome is uncertain:
 
-- Re-fetch poll/my-vote state before allowing another submission attempt.
+- Re-fetch poll/player-vote state before allowing another submission attempt in a future refinement.
+- The backend uniqueness rule must remain authoritative.
+
+## Minimal database model
+
+A tiny relational model is enough:
+
+### `polls`
+
+```text
+id
+question
+option_a_id
+option_a_text
+option_b_id
+option_b_text
+starts_at
+ends_at
+status
+show_results
+created_at
+```
+
+### `votes`
+
+```text
+poll_id
+player_id
+option_id
+created_at
+
+UNIQUE(poll_id, player_id)
+```
+
+Vote totals are derived with a count query. They do not need to be trusted counters stored on the client.
 
 ## Admin requirements
 
@@ -195,7 +232,7 @@ Need to be able to:
 - View totals.
 - Mark/record the winning option.
 
-A full custom admin website is not mandatory. A protected database console or minimal script can be enough initially if it is safe and reliable.
+A full custom admin website is not mandatory. A protected database console or small authenticated script is enough initially.
 
 ## Poll history
 
@@ -209,17 +246,21 @@ Long term, store immutable completed poll records so the game can show a communi
 
 This history is part of the game's identity and gives future players context for why strange features exist.
 
-## Implementation timing
+## Current implementation state
 
-Do not start the voting backend before the local core game loop exists.
+Completed in the Godot client:
 
-Recommended order:
+1. Main-menu vote entry.
+2. Two-option vote screen.
+3. Persistent installation ID.
+4. `VoteService` HTTP boundary.
+5. Load-active-poll request.
+6. Submit-vote request.
+7. Offline/unconfigured fallback that does not block gameplay.
 
-1. FP-01 combat simulation.
-2. Actual waves/death/restart.
-3. Minimal upgrade loop.
-4. Application shell.
-5. Voting client/backend.
-6. Release polish.
+Still required:
 
-The architecture should be ready for voting, but development time should first prove that BOX DEFENSE is a game.
+1. Deploy backend/database.
+2. Configure the production `base_url` in the vote scene.
+3. Test duplicate-vote enforcement and failure behavior.
+4. Add poll history later only if it does not delay release.
