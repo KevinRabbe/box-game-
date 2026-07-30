@@ -1,0 +1,8 @@
+name = "box-defense-voting"
+main = "worker.js"
+compatibility_date = "2026-07-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "box-defense-votes"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
