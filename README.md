@@ -19,6 +19,12 @@ The launch game is intentionally made from simple boxes and basic shapes. The fi
 
 No coins, waves, menus, backend, voting, art assets, or progression are required for FP-01.
 
+### Current implementation status
+
+The first implementation pass for FP-01 is in the repository. It still needs to be opened and run in a Godot 4.x editor/runtime before the milestone is considered verified.
+
+See [Development status](docs/06_DEVELOPMENT_STATUS.md) for the exact verification checklist.
+
 ## Documentation
 
 - [Product vision](docs/01_PRODUCT_VISION.md)
@@ -26,6 +32,7 @@ No coins, waves, menus, backend, voting, art assets, or progression are required
 - [Development roadmap](docs/03_ROADMAP.md)
 - [First playable specification](docs/04_FIRST_PLAYABLE_SPEC.md)
 - [Community voting plan](docs/05_COMMUNITY_VOTING.md)
+- [Development status](docs/06_DEVELOPMENT_STATUS.md)
 
 ## Engine
 
