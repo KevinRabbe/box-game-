@@ -90,7 +90,7 @@ func _spawn_next_enemy() -> void:
 	if _boss_wave and _spawner.has_method("spawn_boss"):
 		_spawner.call("spawn_boss")
 	elif _spawner.has_method("spawn_enemy"):
-		_spawner.call("spawn_enemy")
+		_spawner.call("spawn_enemy", current_wave)
 
 	_remaining_to_spawn -= 1
 	if _remaining_to_spawn > 0:
