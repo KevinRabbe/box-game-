@@ -3,6 +3,7 @@ extends Node
 signal enemy_spawned(enemy: Node2D)
 
 @export var enemy_scene: PackedScene
+@export var boss_scene: PackedScene
 @export var target_path: NodePath
 @export var spawn_margin: float = 40.0
 
@@ -19,12 +20,23 @@ func _ready() -> void:
 
 
 func spawn_enemy() -> Node2D:
-	if not is_instance_valid(_target) or enemy_scene == null:
+	return _spawn_scene(enemy_scene)
+
+
+func spawn_boss() -> Node2D:
+	if boss_scene == null:
+		push_warning("EnemySpawner has no boss_scene assigned; spawning normal enemy instead.")
+		return spawn_enemy()
+	return _spawn_scene(boss_scene)
+
+
+func _spawn_scene(scene: PackedScene) -> Node2D:
+	if not is_instance_valid(_target) or scene == null:
 		return null
 
-	var enemy := enemy_scene.instantiate()
+	var enemy := scene.instantiate()
 	if not enemy is Node2D:
-		push_error("EnemySpawner enemy_scene root must inherit Node2D.")
+		push_error("EnemySpawner enemy scene root must inherit Node2D.")
 		enemy.queue_free()
 		return null
 
