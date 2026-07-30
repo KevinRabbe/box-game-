@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var movement_component: MovementComponent = $MovementComponent
+@onready var contact_damage_component: ContactDamageComponent = $ContactDamageComponent
 
 var _target: Node2D
 
@@ -21,6 +22,14 @@ func _physics_process(_delta: float) -> void:
 
 	velocity = movement_component.velocity_toward(global_position, _target.global_position)
 	move_and_slide()
+
+	for collision_index in get_slide_collision_count():
+		var collision := get_slide_collision(collision_index)
+		if collision.get_collider() == _target:
+			contact_damage_component.apply_to(_target)
+			remove_from_group(&"enemies")
+			queue_free()
+			return
 
 
 func get_health_component() -> HealthComponent:
